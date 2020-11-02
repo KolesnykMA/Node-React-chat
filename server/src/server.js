@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const http = require("http");
+const socketIo = require("socket.io");
 // const path = require("path");
 // const fs = require("fs")
 // const routes = require("./api/routes/index.js");
@@ -55,7 +57,47 @@ app.use('/api/auth/', require('./api/routes/authRoute'));
 //     // eslint-disable-next-line no-console
 //     console.log(`Server listening on port ${env.app.port}!`);
 // });
+const socketServer = http.createServer(app);
+const io = socketIo(socketServer);
 
-app.listen(3001, () => {
-    console.log(`Server listening on port 3000!`);
+const chatsData = new Map();
+const socketData = []
+
+io.on('connection', socket => {
+    socket.join('SR');
+
+    socket.on('message', (messageData) => {
+        const { chatRoomName, newMessage } = messageData;
+        let currentChatData = chatsData.get(chatRoomName);
+
+        console.log(chatRoomName)
+        console.log(newMessage)
+        console.log(currentChatData)
+
+        if (!currentChatData) {
+            chatsData.set(chatRoomName, [newMessage]);
+        } else {
+            currentChatData.push(newMessage);
+        }
+
+        let newData = chatsData.get(chatRoomName);
+
+        io.to("SR").emit("sendChatMessagesFromServer", newData);
+        // console.log(currentChatData)
+
+        // socketData.forEach(innerSocket => {
+        //     innerSocket.emit("sendChatMessagesFromServer", currentChatData);
+        // })
+    })
 });
+
+const port = 3001
+app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+});
+
+const socketPort = 8000;
+socketServer.listen(socketPort, () => {
+    console.log('listening on socket port ', socketPort);
+});
+

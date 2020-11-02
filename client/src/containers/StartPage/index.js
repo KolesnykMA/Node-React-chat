@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+
+import { Button, Input } from 'semantic-ui-react';
 // import PropTypes from 'prop-types';
 // import * as imageService from 'src/services/imageService';
 // import ExpandedPost from 'src/containers/ExpandedPost';
@@ -19,8 +21,19 @@ import { connect } from 'react-redux';
 //   count: 10
 // };
 
+import openSocket from 'socket.io-client';
+const socket = openSocket('http://localhost:8000');
+
+
+// function subscribeToTimer(cb) {
+//   socket.on('timer', timestamp => cb(null, timestamp));
+//   socket.emit('subscribeToTimer', 1000);
+// }
+const currentUser = Math.random();
+const chatRoomName = "Main"
+
 const StartPage = ({
-                       // userId,
+                      //  userId,
                        // loadPosts: load,
                        // loadMorePosts: loadMore,
                        // posts = [],
@@ -28,42 +41,54 @@ const StartPage = ({
                        // hasMorePosts,
                        // addPost: createPost,
                        // likePost: like,
-                       // toggleExpandedPost: toggle
-                   }) => {
+                       // toggleExpandedPost: toggle               
+}) => {
+    const [message, setNewMessage] = useState("");
+    const [messages, setMessages] = useState([])
+
+    useEffect(() => {
+        socket.on("sendChatMessagesFromServer", messages => {
+          setMessages(messages)
+        })
+      }, []);
+
+    const messageChanged = data => {
+      setNewMessage(data);
+    };
+
+    const handleSendMessage = () => {
+      const newMessage = {
+        owner: currentUser,
+        message
+      }
+
+      const data = {
+        chatRoomName,
+        newMessage
+      }
+
+      socket.emit("message", (data))
+    }
+
+    const chatMessages = messages.map((message) => <li>From {message.owner}: {message.message}</li>);
 
     return (
-        <div>
-            This is private starting page with your chats
-            {/* <div className={styles.addPostForm}>
-        <AddPost addPost={createPost} uploadImage={uploadImage} />
-      </div> */}
-            {/* <div className={styles.toolbar}>
-        <Checkbox
-          toggle
-          label="Show only my posts"
-          checked={showOwnPosts}
-          onChange={toggleShowOwnPosts}
+      <>
+        <ul>
+          { chatMessages }
+        </ul>
+        <Input
+          fluid
+          icon="at"
+          iconPosition="left"
+          placeholder="new message"
+          onChange={ev => messageChanged(ev.target.value)}
         />
-      </div> */}
-            {/* <InfiniteScroll
-        pageStart={0}
-        loadMore={getMorePosts}
-        hasMore={hasMorePosts}
-        loader={<Loader active inline="centered" key={0} />}
-      >
-        {posts.map(post => (
-          <Post
-            post={post}
-            likePost={like}
-            toggleExpandedPost={toggle}
-            sharePost={sharePost}
-            key={post.id}
-          />
-        ))}
-      </InfiniteScroll>
-      {expandedPost && <ExpandedPost sharePost={sharePost} />}
-      {sharedPostId && <SharedPostLink postId={sharedPostId} close={() => setSharedPostId(undefined)} />} */}
-        </div>
+        <Button basic icon type="button" onClick={handleSendMessage}>
+          Send message
+        </Button>
+      </>
+        
     );
 };
 
