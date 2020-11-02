@@ -30,11 +30,14 @@ module.exports = {
         try {
             const newUser = await userRepository.addUser(userData);
 
-            return (newUser);
-        } catch (error) {
             return {
-                error: error.message
+                newUser
             };
+        } catch (error) {
+            throw new Error(error.message)
+            // return {
+            //     error: error.message
+            // };
         }
     }
 }

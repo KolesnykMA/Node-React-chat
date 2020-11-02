@@ -22,7 +22,7 @@ router
         (req, res, next) => {
             authService.register(req.body)
                 .then(data => res.send(data))
-                .catch(next)
+                .catch(error => next(error))
         }
 
     )

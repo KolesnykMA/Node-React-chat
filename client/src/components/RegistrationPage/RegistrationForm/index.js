@@ -7,10 +7,20 @@ const RegistrationForm = ({ register: signOn }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
+    const [login, setLogin] = useState('');
+
+    const [error, setError] = useState('')
+
     const [isLoading, setLoading] = useState(false);
     const [isEmailValid, setEmailValid] = useState(true);
     const [isUsernameValid, setUsernameValid] = useState(true);
     const [isPasswordValid, setPasswordValid] = useState(true);
+    const [isLoginValid, setLoginValid] = useState(true);
+
+    const loginChanged = value => {
+        setLogin(value);
+        setLoginValid(true);
+    };
 
     const emailChanged = value => {
         setEmail(value);
@@ -28,13 +38,13 @@ const RegistrationForm = ({ register: signOn }) => {
     };
 
     const register = async () => {
-        const isValid = isEmailValid && isUsernameValid && isPasswordValid;
+        const isValid = isEmailValid && isUsernameValid && isPasswordValid && isLoginValid;
         if (!isValid || isLoading) {
             return;
         }
         setLoading(true);
         try {
-            await signOn({ email, password, username });
+            await signOn({ login, email, password, username })
         } catch {
             setLoading(false);
         }
@@ -43,6 +53,15 @@ const RegistrationForm = ({ register: signOn }) => {
     return (
         <Form name="registrationForm" size="large" onSubmit={register}>
             <Segment>
+                <Form.Input
+                    fluid
+                    icon="at"
+                    iconPosition="left"
+                    placeholder="login"
+                    error={!isEmailValid}
+                    onChange={ev => loginChanged(ev.target.value)}
+                    onBlur={() => setLoginValid(Boolean(login))}
+                />
                 <Form.Input
                     fluid
                     icon="at"

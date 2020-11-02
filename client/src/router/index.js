@@ -8,15 +8,24 @@ import LoginPage from '../containers/LoginPage';
 import RegistrationPage from '../containers/RegistrationPage';
 import NotFound from '../containers/NotFound';
 
+import Header from '../components/Header';
+
 import PrivateRoute from './privateRoute';
 import PublicRoute from './publicRoute';
 
-import { loadCurrentUser, logout } from '../store/profile/actions';
+import { loadCurrentUser, logoutCurrentUser } from '../containers/Profile/actions';
 
 
-const Routing = ({user, isAuthorized, loadCurrentUser: loadUser, isLoading }) => {
+const Routing = (
+    { 
+        user, 
+        isAuthorized, 
+        loadCurrentUser: loadUser, 
+        isLoading,
+        logoutCurrentUser: logOutUser
+    }) => {
+
     useEffect(() => {
-
         if (!isAuthorized) {
             loadUser();
         }
@@ -24,33 +33,35 @@ const Routing = ({user, isAuthorized, loadCurrentUser: loadUser, isLoading }) =>
 
     return (
         isLoading
-            ? <> loading </>
+            ? 
+                <div className="loading">
+                    loading 
+                </div>
             : (
                 <div className="fill">
-                    {isAuthorized && (
-                        <header>
-                            {user._id}
-                        </header>
-                    )}
-                    <main className="fill">
-                        <Switch>
-                            <PublicRoute exact path="/login" component={LoginPage} />
-                            <PublicRoute exact path="/registration" component={RegistrationPage} />
-                            <PrivateRoute exact path="/" component={StartPage} />
-                            {/* <PrivateRoute exact path="/profile" component={Profile} />
-              <PrivateRoute path="/share/:postHash" component={SharedPost} /> */}
-                            <Route path="*" exact component={NotFound} />
-                        </Switch>
-                    </main>
-                    {/* <Notifications applyPost={newPost} user={user} /> */}
+                  {isAuthorized && (
+                    <header>
+                        <Header user={user} logout={logOutUser} />
+                    </header>
+                  )}
+                  <main className="fill">
+                    <Switch>
+                      <PublicRoute exact path="/login" component={LoginPage} />
+                      <PublicRoute exact path="/registration" component={RegistrationPage} />
+
+                      <PrivateRoute exact path="/" component={StartPage} />
+
+                      <Route path="*" exact component={NotFound} />
+                    </Switch>
+                  </main>
                 </div>
-            )
+              )
     );
 };
 
 const actions = {
     loadCurrentUser,
-    //  logout, applyPost
+    logoutCurrentUser
 };
 
 const mapStateToProps = ({ profile }) => ({
