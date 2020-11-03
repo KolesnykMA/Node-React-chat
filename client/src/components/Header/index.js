@@ -5,20 +5,25 @@ import { Header as HeaderUI, Image, Grid, Icon, Button } from 'semantic-ui-react
 
 
 const Header = ({ user, logout }) => {
-
-
   return (
     <div>
       <Grid centered container columns="2">
         <Grid.Column>
           {user && (
-            <NavLink exact to="/">
-              <HeaderUI>
-                <Image />
-                {' '}
-                {user.username}
-              </HeaderUI>
-            </NavLink>
+            <div>
+              <NavLink exact to="/">
+                <HeaderUI>
+                  Home
+                </HeaderUI>
+              </NavLink>
+
+              <NavLink exact to="/profile">
+                <HeaderUI>
+                  Username: {user.username}
+                </HeaderUI>
+              </NavLink>
+            </div>
+
           )}
         </Grid.Column>
         <Grid.Column textAlign="right">

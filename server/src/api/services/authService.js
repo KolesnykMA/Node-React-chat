@@ -7,18 +7,18 @@ module.exports = {
             const currentUser = await userRepository.getByLogin(login);
 
             if(!currentUser){
-                throw new Error('LOGIN_NOT_EXISTS');
+                throw Error('LOGIN_NOT_EXISTS');
             }
 
             if (currentUser.password !== password){
-                throw new Error('WRONG_PASSWORD');
+                throw Error('WRONG_PASSWORD');
             }
 
             return {
                 currentUser
             };
         } catch (error) {
-            throw new Error(error.message)
+            throw Error(error.message)
             // return {
             //     error: error.message
             // };

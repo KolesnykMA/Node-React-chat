@@ -1,134 +1,137 @@
-
-import React, { useState, useEffect } from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-
-import { Button, Input } from 'semantic-ui-react';
-// import PropTypes from 'prop-types';
-// import * as imageService from 'src/services/imageService';
-// import ExpandedPost from 'src/containers/ExpandedPost';
-// import Post from 'src/components/Post';
-// import AddPost from 'src/components/AddPost';
-// import SharedPostLink from 'src/components/SharedPostLink';
-// import { Checkbox, Loader } from 'semantic-ui-react';
-// import InfiniteScroll from 'react-infinite-scroller';
-// import { loadPosts, loadMorePosts, likePost, toggleExpandedPost, addPost } from './actions';
-
-
-// const postsFilter = {
-//   userId: undefined,
-//   from: 0,
-//   count: 10
-// };
-
+import React, {useEffect, useState} from 'react';
+import {Link} from 'react-router-dom';
+import {connect} from 'react-redux';
+import {Button, Input} from 'semantic-ui-react';
 import openSocket from 'socket.io-client';
+import { getConnectedChats, joinUserToChat } from "../../api/chatService"
+import Chat from "../../components/Chat";
+import { getMessagesByChatId } from "../../api/messageService";
+
 const socket = openSocket('http://localhost:8000');
 
+const StartPage = ({ user }) => {
+  const [connectedChats, setConnectedChats] = useState([]);
+  const [serverResponse, setServerResponse] = useState({});
+  const [loading, setLoading] = useState(true);
 
-// function subscribeToTimer(cb) {
-//   socket.on('timer', timestamp => cb(null, timestamp));
-//   socket.emit('subscribeToTimer', 1000);
-// }
-const currentUser = Math.random();
-const chatRoomName = "Main"
+  const [joinChatId, setJoinChatId] = useState("");
+  const [joinChatPassword, setJoinChatPassword] = useState("");
 
-const StartPage = ({
-                      //  userId,
-                       // loadPosts: load,
-                       // loadMorePosts: loadMore,
-                       // posts = [],
-                       // expandedPost,
-                       // hasMorePosts,
-                       // addPost: createPost,
-                       // likePost: like,
-                       // toggleExpandedPost: toggle               
-}) => {
-    const [message, setNewMessage] = useState("");
-    const [messages, setMessages] = useState([])
+  useEffect(() => {
+    async function getInitialChats() {
+      setLoading(true)
+      const response = await getConnectedChats(user._id);
+      const chats = response.data
 
-    useEffect(() => {
-        socket.on("sendChatMessagesFromServer", messages => {
-          setMessages(messages)
-        })
-      }, []);
+      socket.emit("connectUserToChats", chats)
 
-    const messageChanged = data => {
-      setNewMessage(data);
-    };
-
-    const handleSendMessage = () => {
-      const newMessage = {
-        owner: currentUser,
-        message
+      for (const chat of chats) {
+        chat.messages = await getMessagesByChatId(chat._id)
       }
 
-      const data = {
-        chatRoomName,
-        newMessage
-      }
-
-      socket.emit("message", (data))
+      return chats
     }
 
-    const chatMessages = messages.map((message) => <li>From {message.owner}: {message.message}</li>);
+    getInitialChats()
+      .then(modifiedChats => {
+        setConnectedChats(modifiedChats)
+        setLoading(false)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }, [])
 
-    return (
-      <>
-        <ul>
-          { chatMessages }
-        </ul>
+  useEffect(() => {
+    socket.on("sendChatMessagesFromServer", response => {
+      setServerResponse(response)
+    })
+  }, []);
+
+  useEffect(() => {
+    const { chatId, sendMessages } = serverResponse;
+
+    setConnectedChats(
+      connectedChats.map(chat =>
+        chat._id === chatId
+          ? {...chat, messages: sendMessages}
+          : chat
+      )
+    )
+  }, [serverResponse])
+
+  const handleSendMessage = (data) => {
+    socket.emit("message", (data))
+  }
+
+  const handleJoinChat = () => {
+    const chatData = {
+      userId: user._id,
+      chatId: joinChatId,
+      password: joinChatPassword
+    }
+
+    joinUserToChat(chatData)
+      .then(response => {
+        alert("You have joined chat")
+      })
+      .catch(error => {
+        alert(error)
+      })
+  }
+
+  const joinChatIdChanged = data => {
+    setJoinChatId(data);
+  };
+
+  const joinChatPasswordChanged = data => {
+    setJoinChatPassword(data);
+  }
+
+  return (
+    loading
+      ?
+      <div className="loading">
+        loading
+      </div>
+      :
+      <div className="start-page" style={{textAlign: "center"}}>
+        {connectedChats.map((chat, id) => {
+          const currentChatMessages = chat.messages
+          return <Chat user={ user } chatId={ chat._id } messages={currentChatMessages} onSendMessage={handleSendMessage}/>
+        })}
+
+        <Link to={{
+          pathname: '/create-chat',
+          state: {
+            user
+          }
+        }}>
+          Create chat
+        </Link>
+
         <Input
-          fluid
-          icon="at"
-          iconPosition="left"
-          placeholder="new message"
-          onChange={ev => messageChanged(ev.target.value)}
+          placeholder="chat id"
+          onChange={ev => joinChatIdChanged(ev.target.value)}
         />
-        <Button basic icon type="button" onClick={handleSendMessage}>
-          Send message
+        <Input
+          placeholder="chat password"
+          onChange={ev => joinChatPasswordChanged(ev.target.value)}
+        />
+        <Button basic icon type="button" onClick={handleJoinChat}>
+          Join chat
         </Button>
-      </>
-        
-    );
+      </div>
+  );
 };
 
-StartPage.propTypes = {
-    // posts: PropTypes.arrayOf(PropTypes.object),
-    // hasMorePosts: PropTypes.bool,
-    // expandedPost: PropTypes.objectOf(PropTypes.any),
-    // userId: PropTypes.string,
-    // loadPosts: PropTypes.func.isRequired,
-    // loadMorePosts: PropTypes.func.isRequired,
-    // likePost: PropTypes.func.isRequired,
-    // toggleExpandedPost: PropTypes.func.isRequired,
-    // addPost: PropTypes.func.isRequired
-};
-
-StartPage.defaultProps = {
-    // posts: [],
-    // hasMorePosts: true,
-    // expandedPost: undefined,
-    // userId: undefined
-};
-
-const mapStateToProps = rootState => ({
-    // posts: rootState.posts.posts,
-    // hasMorePosts: rootState.posts.hasMorePosts,
-    // expandedPost: rootState.posts.expandedPost,
-    // userId: rootState.profile.user.id
+const mapStateToProps = ({ profile }) => ({
+    user: profile.user,
 });
 
-const actions = {
-    // loadPosts,
-    // loadMorePosts,
-    // likePost,
-    // toggleExpandedPost,
-    // addPost
-};
-
-const mapDispatchToProps = dispatch => bindActionCreators(actions, dispatch);
+// const mapDispatchToProps = dispatch => bindActionCreators(actions, dispatch);
 
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    // mapDispatchToProps
 )(StartPage);

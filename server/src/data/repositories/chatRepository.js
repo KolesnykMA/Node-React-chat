@@ -4,26 +4,61 @@ const BaseRepository =  require('./baseRepository.js');
 class ChatRepository extends BaseRepository{
     // Custom methods
 
-    async getUserCreatedChats(chatCreatorId) {
-        try {
-            return await this.model.find({ "chatCreatorId": chatCreatorId });
-        } catch (error) {
-            throw new Error(`${this.model.collection.collectionName}_REPOSITORY_CREATE`)
-        }
-
-    }
+    // async getUserCreatedChats(chatCreatorId) {
+    //     try {
+    //         return await this.model.find({ "chatCreatorId": chatCreatorId });
+    //     } catch (error) {
+    //         throw new Error(`${this.model.collection.collectionName}_REPOSITORY_CREATE`)
+    //     }
+    //
+    // }
 
     async getUserConnectedChatsByUserId(userId) {
         try {
-            if (!await UserModel.findOne({ "_id":  userId })) {
-                throw new Error('USER_NOT_EXISTS');
-            }
-
-            return await this.model.find({"connectedUsersId": {"$in": [userId]}});
+            await UserModel.findOne({ "_id":  userId });
         } catch (error) {
-            throw new Error(`${this.model.collection.collectionName}_REPOSITORY_CREATE`)
+            throw Error('USER_NOT_EXISTS');
         }
 
+        return await this.model.find({"connectedUsersId": {"$in": [userId]}});
+    }
+
+    async joinChatByUserAndChatId(chatData) {
+        const { userId, chatId, password } = chatData;
+        let chat = {};
+
+        try {
+            await UserModel.findOne({ "_id":  userId });
+        } catch (error) {
+            throw Error('USER_NOT_EXISTS');
+        }
+
+        try {
+            chat = await this.model.findOne({ "_id":  chatId })
+        } catch (error) {
+            throw Error('CHAT_NOT_EXISTS');
+        }
+
+        if (chat.chatPassword !== password) {
+            throw Error('CHAT_WRONG_PASSWORD');
+        }
+
+        const currentChatUsersId = chat.connectedUsersId
+
+        if (currentChatUsersId.indexOf(userId) !== -1) {
+            throw Error('USER_ALREADY_IN_CHAT');
+        } else {
+            currentChatUsersId.push(userId)
+        }
+
+        let newChatData = {
+            chatCreatorId: chat.chatCreatorId,
+            chatPassword: chat.chatPassword,
+            connectedUsersId: currentChatUsersId,
+            blackListUsersId: chat.blackListUsersId
+        }
+
+        return this.updateById(chatId, newChatData);
     }
 
     // Base repo
@@ -40,10 +75,12 @@ class ChatRepository extends BaseRepository{
         const { chatCreatorId } = chat;
 
         if (!await UserModel.findOne({ "_id":  chatCreatorId })) {
-            throw new Error('USER_NOT_EXISTS');
+            throw Error('USER_NOT_EXISTS');
         }
 
         //check password
+
+        chat.connectedUsersId = [chatCreatorId];
 
         return this.create(chat);
     }

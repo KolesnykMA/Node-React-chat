@@ -24,7 +24,6 @@ const composedEnhancers = compose(
 );
 
 const reducers = {
-    // posts: threadReducer,
     profile: profileReducer
 };
 

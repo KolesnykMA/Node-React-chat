@@ -14,15 +14,15 @@ class UserRepository extends BaseRepository {
         const { login, email, password, username, avatar } = user;
 
         if (await this.model.findOne({ email })){
-            throw new Error('EMAIL_EXISTS');
+            throw Error('EMAIL_EXISTS');
         }
 
         if (await this.model.findOne({ login })){
-            throw new Error('LOGIN_EXISTS');
+            throw Error('LOGIN_EXISTS');
         }
 
         if (await this.model.findOne({ username })){
-            throw new Error('USERNAME_EXISTS');
+            throw Error('USERNAME_EXISTS');
         }
 
         return this.create(user);

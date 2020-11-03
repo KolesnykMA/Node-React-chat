@@ -7,7 +7,7 @@ class BaseRepository {
         try {
             return await this.model.find({});
         } catch (error) {
-            throw new Error(`${this.model.collection.collectionName}_BASE_REPOSITORY_GET_ALL`)
+            throw Error(`${this.model.collection.collectionName}_BASE_REPOSITORY_GET_ALL`)
         }
     }
 
@@ -15,7 +15,7 @@ class BaseRepository {
         try {
             return await this.model.findOne({ "_id": id });
         } catch (error) {
-            throw new Error(`${this.model.collection.collectionName}_BASE_REPOSITORY_GET_BY_ID`)
+            throw Error(`${this.model.collection.collectionName}_BASE_REPOSITORY_GET_BY_ID`)
         }
     }
 
@@ -29,7 +29,7 @@ class BaseRepository {
                 data
             };
         } catch (error) {
-            throw new Error(`${this.model.collection.collectionName}_REPOSITORY_CREATE`)
+            throw Error(`${this.model.collection.collectionName}_REPOSITORY_CREATE`)
         }
 
     }
@@ -38,7 +38,7 @@ class BaseRepository {
         try {
             return await this.model.updateOne({ "_id": id }, { $set: data })
         } catch (error) {
-            throw new Error(`${this.model.collection.collectionName}_REPOSITORY_UPDATE`)
+            throw Error(`${this.model.collection.collectionName}_REPOSITORY_UPDATE`)
         }
     }
 
@@ -46,7 +46,7 @@ class BaseRepository {
         try {
             return await this.model.deleteOne({ "_id": id})
         } catch (error) {
-            throw new Error(`${this.model.collection.collectionName}_REPOSITORY_DELETE`)
+            throw Error(`${this.model.collection.collectionName}_REPOSITORY_DELETE`)
         }
     }
 }

@@ -1,6 +1,6 @@
 module.exports = (Schema, model, name) => {
     const MessageSchema = new Schema({
-        messageCreator: {
+        messageCreatorId: {
             type: String,
             required: true,
         },
@@ -8,10 +8,14 @@ module.exports = (Schema, model, name) => {
             type: String,
             required: true
         },
+        messageText: {
+            type: String,
+            required: true
+        },
         messageSentAt: {
-            type: Array,
+            type: Date,
             required: false,
-        }
+        },
     });
 
     return model(name, MessageSchema);

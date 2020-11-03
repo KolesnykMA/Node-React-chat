@@ -13,7 +13,9 @@ router
         (req, res, next) => {
             authService.login(req.body)
                 .then(data => res.send(data))
-                .catch(error => next(error))
+                .catch(error => {
+                    res.status(400).json({error: true, message: error.message});
+                })
         }
     )
 
@@ -22,14 +24,16 @@ router
         (req, res, next) => {
             authService.register(req.body)
                 .then(data => res.send(data))
-                .catch(error => next(error))
+                .catch(error => {
+                    res.status(400).json({error: true, message: error.message});
+                })
         }
 
     )
 
-    .get(
-        '/user',
-        (req, res, next) => res.send('Hello'))
+    // .get(
+    //     '/user',
+    //     (req, res, next) => res.send('Hello'))
 
 
 module.exports = router;

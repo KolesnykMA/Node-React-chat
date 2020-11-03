@@ -1,19 +1,20 @@
-import React, { useEffect } from 'react';
-import { Route, Switch } from 'react-router-dom';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import React, { useEffect } from "react";
+import { Route, Switch } from "react-router-dom";
+import { bindActionCreators } from "redux";
+import { connect } from "react-redux";
 
 import StartPage from "../containers/StartPage";
-import LoginPage from '../containers/LoginPage';
-import RegistrationPage from '../containers/RegistrationPage';
-import NotFound from '../containers/NotFound';
+import LoginPage from "../containers/LoginPage";
+import RegistrationPage from "../containers/RegistrationPage";
+import NotFound from "../containers/NotFound";
+import ChatCreatePage from "../containers/Chat/ChatCreatePage"
 
-import Header from '../components/Header';
+import Header from "../components/Header";
 
-import PrivateRoute from './privateRoute';
-import PublicRoute from './publicRoute';
+import PrivateRoute from "./privateRoute";
+import PublicRoute from "./publicRoute";
 
-import { loadCurrentUser, logoutCurrentUser } from '../containers/Profile/actions';
+import { loadCurrentUser, logoutCurrentUser } from "../containers/Profile/actions";
 
 
 const Routing = (
@@ -50,6 +51,7 @@ const Routing = (
                       <PublicRoute exact path="/registration" component={RegistrationPage} />
 
                       <PrivateRoute exact path="/" component={StartPage} />
+                      <PrivateRoute exact path="/create-chat" component={ChatCreatePage} />
 
                       <Route path="*" exact component={NotFound} />
                     </Switch>

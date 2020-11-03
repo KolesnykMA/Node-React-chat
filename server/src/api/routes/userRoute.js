@@ -14,7 +14,9 @@ router
 
             userService.getAll()
                 .then(data => res.send(data))
-                .catch(next)
+                .catch(error => {
+                    res.status(400).json({error: true, message: error.message});
+                })
         }
     )
 
@@ -23,7 +25,9 @@ router
         (req, res, next) => {
             userService.getById(req.params.id)
                 .then(data => res.send(data))
-                .catch(next)
+                .catch(error => {
+                    res.status(400).json({error: true, message: error.message});
+                })
         }
     )
     //
