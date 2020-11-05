@@ -4,18 +4,17 @@ const BaseRepository =  require('./baseRepository.js');
 class MessageRepository extends BaseRepository{
   // Custom methods
   async getAllMessagesByChatId(chatId) {
-    return await this.model.find({ "chatId": chatId })
+    return await this.model.find({ "chatId": chatId });
   }
 
   // Base repo
-
   getAllMessages() {
     return this.getAll();
   }
 
-  // getChatById(chatId) {
-  //     return this.getById(chatId);
-  // }
+  getChatById(chatId) {
+      return this.getById(chatId);
+  }
 
   async createMessage(messageData) {
     const { chatId } = messageData;
@@ -29,13 +28,13 @@ class MessageRepository extends BaseRepository{
     return this.create(messageData);
   }
 
-  // updateChatById(chatId, data) {
-  //     return this.updateById(chatId, data);
-  // }
-  //
-  // deleteChatById(chatId) {
-  //     return this.deleteById(chatId)
-  // }
+  updateChatById(chatId, data) {
+      return this.updateById(chatId, data);
+  }
+
+  deleteChatById(chatId) {
+      return this.deleteById(chatId);
+  }
 }
 
 module.exports = new MessageRepository(MessageModel);

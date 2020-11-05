@@ -1,33 +1,27 @@
 const mongoose = require('mongoose');
-const dataBaseConfig = require("../config/dataBaseConfig");
-const mode = process.env.NODE_ENV
+const dataBaseConfig = require("../../config/dataBaseConfig");
 
 class DataBaseConnector {
-
-  constructor(dataBaseConfig, mode) {
-    const { database, databaseURLDev, databaseURLProd } = dataBaseConfig;
-    this.dataBaseName = database
-
-    if (mode === "dev") {
-      this.dataBaseUrl = databaseURLDev
-    } else if (mode === "prod") {
-      this.dataBaseUrl = databaseURLProd
-    }
+  constructor(dataBaseConfig) {
+    const { databaseURL, databasePort, databaseName } = dataBaseConfig;
+    this.databaseURL = databaseURL;
+    this.databasePort = databasePort;
+    this.databaseName = databaseName;
+    this.databaseConnectionPath = `mongodb://${this.databaseURL}:${this.databasePort}/${this.databaseName}`;
   }
 
   async connect() {
     try {
-      const connectionString = `${this.dataBaseUrl}${this.dataBaseName}`
-
       mongoose.set('useCreateIndex', true);
       await mongoose.connect(
-        connectionString, {
+        this.databaseConnectionPath,
+        {
           useNewUrlParser: true,
           useUnifiedTopology: true
         },
       )
     } catch (e) {
-      throw `Error when connecting to ${this.dataBaseName} error: ${e}.`
+      throw `Error when connecting to ${this.databaseConnectionPath} error: ${e}.`
     }
   }
 
@@ -35,9 +29,9 @@ class DataBaseConnector {
     try {
       await mongoose.disconnect();
     } catch (e) {
-      throw `Error when disconnecting to ${this.dataBaseName} error: ${e}.`
+      throw `Error when disconnecting to ${this.databaseConnectionPath} error: ${e}.`
     }
   }
 }
 
-module.exports = new DataBaseConnector(dataBaseConfig, mode);
+module.exports = new DataBaseConnector(dataBaseConfig);

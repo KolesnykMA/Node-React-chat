@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { secret, expireTime } = require("../../data/config/jwtConfig")
-
+const { secret } = require("../../config/jwtConfig")
 
 const jwtValidation = async (req, res, next) => {
   try {
@@ -14,7 +13,7 @@ const jwtValidation = async (req, res, next) => {
     next();
   } catch (err) {
     return res.status(401).send({
-      msg: 'Your session is not valid!'
+      msg: 'SESSION_NOT_VALID!'
     });
   }
 }

@@ -10,7 +10,7 @@ class UserRepository extends BaseRepository {
     return this.getById(id);
   }
 
-  async addUser(user) {
+  async createUser(user) {
     const { login, email, password, username, avatar } = user;
 
     if (await this.model.findOne({ email })){

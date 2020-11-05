@@ -1,1 +1,0 @@
-export const MAXIMUM_USERS_FOR_ONE_ROOM = 5;

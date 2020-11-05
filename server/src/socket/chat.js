@@ -28,7 +28,7 @@ const chat = io => {
 
         io.to(clientSocketId).emit('sendChatsWithMessagesFromServer', modifiedChats)
       } catch (error) {
-        console.log(error, "connect")
+        socket.emit("sendChatMessagesFromServerError", { error: true, message: "on.connectUserToChats" });
       }
     })
 
@@ -44,7 +44,7 @@ const chat = io => {
           })
         })
         .catch(error => {
-          socket.emit("sendChatMessagesFromServerError", { error:true });
+          socket.emit("sendChatMessagesFromServerError", { error: true, message: "on.sendMessageFromClient" });
         })
     })
   });

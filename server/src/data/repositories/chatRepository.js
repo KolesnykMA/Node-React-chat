@@ -11,8 +11,6 @@ class ChatRepository extends BaseRepository {
       throw Error('USER_NOT_EXISTS');
     }
 
-    // console.log(connectedChats, "repo")
-
     return await this.model.find({"connectedUsersId": {"$in": [userId]}})
   }
 

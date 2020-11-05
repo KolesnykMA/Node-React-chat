@@ -1,13 +1,14 @@
 class BaseRepository {
   constructor(model) {
     this.model = model;
+    this.modelName = model.collection.collectionName;
   }
 
   async getAll() {
     try {
       return await this.model.find({});
     } catch (error) {
-      throw Error(`${this.model.collection.collectionName}_BASE_REPOSITORY_GET_ALL`)
+      throw Error(`${this.modelName}_BASE_REPOSITORY_GET_ALL`)
     }
   }
 
@@ -15,7 +16,7 @@ class BaseRepository {
     try {
       return await this.model.findOne({ "_id": id });
     } catch (error) {
-      throw Error(`${this.model.collection.collectionName}_BASE_REPOSITORY_GET_BY_ID`)
+      throw Error(`${this.modelName}_BASE_REPOSITORY_GET_BY_ID`);
     }
   }
 
@@ -25,11 +26,11 @@ class BaseRepository {
       await newModelObject.save(newModelObject);
 
       return {
-        message: `New ${this.model.collection.collectionName} created.`,
+        message: `New ${this.modelName} created.`,
         data
       };
     } catch (error) {
-      throw Error(`${this.model.collection.collectionName}_REPOSITORY_CREATE`)
+      throw Error(`${this.modelName}_REPOSITORY_CREATE`);
     }
 
   }
@@ -38,7 +39,7 @@ class BaseRepository {
     try {
       return await this.model.updateOne({ "_id": id }, { $set: data })
     } catch (error) {
-      throw Error(`${this.model.collection.collectionName}_REPOSITORY_UPDATE`)
+      throw Error(`${this.model.collection.collectionName}_REPOSITORY_UPDATE`);
     }
   }
 
@@ -46,7 +47,7 @@ class BaseRepository {
     try {
       return await this.model.deleteOne({ "_id": id})
     } catch (error) {
-      throw Error(`${this.model.collection.collectionName}_REPOSITORY_DELETE`)
+      throw Error(`${this.model.collection.collectionName}_REPOSITORY_DELETE`);
     }
   }
 }

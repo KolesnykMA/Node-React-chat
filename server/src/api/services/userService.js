@@ -5,9 +5,7 @@ module.exports = {
     try {
       return await userRepository.getAllUsers();
     } catch (error) {
-      return {
-        error: error.message
-      };
+      throw Error(error.message);
     }
   },
 
@@ -22,9 +20,31 @@ module.exports = {
         login: user.login
       };
     } catch (error) {
-      return {
-        error: error.message
-      };
+      throw Error(error.message);
+    }
+  },
+
+  create: async () => {
+    try {
+      return await userRepository.getAllUsers();
+    } catch (error) {
+      throw Error(error.message);
+    }
+  },
+
+  update: async () => {
+    try {
+      // return await userRepository.getAllUsers();
+    } catch (error) {
+      throw Error(error.message);
+    }
+  },
+
+  delete: async () => {
+    try {
+      return await userRepository.getAllUsers();
+    } catch (error) {
+      throw Error(error.message);
     }
   },
 }

@@ -18,9 +18,6 @@ module.exports = {
       return returnMessages;
     } catch (error) {
       throw Error(error.message);
-      // return {
-      //     error: error.message
-      // };
     }
   },
 
@@ -31,21 +28,8 @@ module.exports = {
       return await MessageRepository.getAllMessages();
     } catch (error) {
       throw Error(error.message);
-      // return {
-      //     error: error.message
-      // };
     }
   },
-
-  // getById: async (messageId) => {
-  //     try {
-  //         return await MessageRepository.getMessage(messageId);
-  //     } catch (error) {
-  //         return {
-  //             error: error.message
-  //         };
-  //     }
-  // },
 
   create: (messageData) => {
     try {
@@ -54,18 +38,11 @@ module.exports = {
       return (newChat);
     } catch (error) {
       throw Error(error.message);
-      // return {
-      //     error: error.message
-      // };
     }
   },
 
   // update: async (messageData) => {
   //     try {
-  //
-  //
-  //         // if chat exists
-  //
   //         return await MessageRepository.updateMessageById(chatId, body);
   //     } catch (error) {
   //         return {
@@ -76,7 +53,6 @@ module.exports = {
 
   // delete: async (messageId) => {
   //     try {
-  //         //
   //         return await MessageRepository.deleteMessageById(chatId)
   //     } catch (error) {
   //         // return {

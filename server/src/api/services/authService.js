@@ -1,6 +1,6 @@
 const userRepository = require("../../data/repositories/userRepository.js");
 const jwt = require('jsonwebtoken');
-const { secret, expireTime } = require("../../data/config/jwtConfig")
+const { secret } = require("../../config/jwtConfig")
 
 module.exports = {
   login: async (userData) => {
@@ -23,38 +23,20 @@ module.exports = {
         token
       };
     } catch (error) {
-      throw Error(error.message)
-      // return {
-      //     error: error.message
-      // };
+      throw Error(error.message);
     }
 
   },
 
   register : async (userData) => {
     try {
-      const newUser = await userRepository.addUser(userData);
+      const newUser = await userRepository.createUser(userData);
 
       return {
         newUser
       };
     } catch (error) {
-      throw new Error(error.message)
-      // return {
-      //     error: error.message
-      // };
+      throw new Error(error.message);
     }
   },
-
-  getUser: async () => {
-    try {
-      const newUser = await userRepository.addUser(userData);
-
-      return {
-        newUser
-      };
-    } catch (error) {
-      throw new Error(error.message)
-    }
-  }
 }
