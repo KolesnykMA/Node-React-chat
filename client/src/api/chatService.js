@@ -1,11 +1,15 @@
 const back_dev_url = "http://localhost:3001";
 const axios = require("axios");
-const queryString = require("query-string");
+const { getFetchHeaders } = require("../helpers/webApiHelper");
 
 const createChat = async (chatData) => {
   return new Promise((res, rej) => {
     axios
-      .post(`${back_dev_url}/api/chats`, chatData)
+      .post(
+        `${back_dev_url}/api/chats`,
+        getFetchHeaders(),
+        chatData
+      )
       .then(response => {
         res(response)
       })
@@ -19,7 +23,10 @@ const createChat = async (chatData) => {
 const getConnectedChats = async (userId) => {
   return new Promise((res, rej) => {
     axios
-      .get(`${back_dev_url}/api/chats/connected/?id=${userId}`)
+      .get(
+        `${back_dev_url}/api/chats/connected/?id=${userId}`,
+        getFetchHeaders(),
+        )
       .then(response => {
         res(response)
       })
@@ -33,7 +40,11 @@ const getConnectedChats = async (userId) => {
 const joinUserToChat = async (chatData) => {
   return new Promise((res, rej) => {
     axios
-      .post(`${back_dev_url}/api/chats/join`, chatData)
+      .post(
+        `${back_dev_url}/api/chats/join`,
+        getFetchHeaders(),
+        chatData,
+      )
       .then(response => {
         res(response)
       })

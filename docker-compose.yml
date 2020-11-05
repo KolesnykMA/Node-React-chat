@@ -1,0 +1,25 @@
+version: "3"
+services:
+  mongo:
+    container_name: mongo
+    image: mongo
+    ports:
+      - "27017:27017"
+  server:
+    container_name: server
+    build: server/
+#    environment:
+#      - NODE_ENV=production
+    ports:
+      - "49160:3001"
+    links:
+      - mongo
+#  client:
+#    build: client/
+#    environment:
+#      - NODE_ENV=production
+#    # network_mode: host
+#    ports:
+#      - "80:80"
+#    depends_on:
+#      - server

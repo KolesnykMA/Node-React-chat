@@ -19,46 +19,49 @@ const StartPage = ({ user }) => {
 
   useEffect(() => {
     async function getInitialChats() {
-      setLoading(true)
+    //   setLoading(true)
       const response = await getConnectedChats(user._id);
       const chats = response.data
 
-      socket.emit("connectUserToChats", chats)
-
-      for (const chat of chats) {
-        chat.messages = await getMessagesByChatId(chat._id)
-      }
-
       return chats
+
+      // socket.emit("connectUserToChats", user._id)
+    //
+    //   for (const chat of chats) {
+    //     chat.messages = await getMessagesByChatId(chat._id)
+    //   }
+    //
+    //   return chats
     }
 
     getInitialChats()
       .then(modifiedChats => {
-        setConnectedChats(modifiedChats)
-        setLoading(false)
+        console.log(modifiedChats)
+        // setConnectedChats(modifiedChats)
+        // setLoading(false)
       })
       .catch(error => {
         console.log(error)
       })
   }, [])
 
-  useEffect(() => {
-    socket.on("sendChatMessagesFromServer", response => {
-      setServerResponse(response)
-    })
-  }, []);
+  // useEffect(() => {
+  //   socket.on("sendChatMessagesFromServer", response => {
+  //     setServerResponse(response)
+  //   })
+  // }, []);
 
-  useEffect(() => {
-    const { chatId, sendMessages } = serverResponse;
-
-    setConnectedChats(
-      connectedChats.map(chat =>
-        chat._id === chatId
-          ? {...chat, messages: sendMessages}
-          : chat
-      )
-    )
-  }, [serverResponse])
+  // useEffect(() => {
+  //   const { chatId, sendMessages } = serverResponse;
+  //
+  //   setConnectedChats(
+  //     connectedChats.map(chat =>
+  //       chat._id === chatId
+  //         ? {...chat, messages: sendMessages}
+  //         : chat
+  //     )
+  //   )
+  // }, [serverResponse])
 
   const handleSendMessage = (data) => {
     socket.emit("message", (data))
@@ -96,10 +99,14 @@ const StartPage = ({ user }) => {
       </div>
       :
       <div className="start-page" style={{textAlign: "center"}}>
-        {connectedChats.map((chat, id) => {
-          const currentChatMessages = chat.messages
-          return <Chat user={ user } chatId={ chat._id } messages={currentChatMessages} onSendMessage={handleSendMessage}/>
-        })}
+        {/*{connectedChats.map((chat, id) => {*/}
+        {/*  const currentChatMessages = chat.messages*/}
+        {/*  return <Chat */}
+        {/*    user={ user } */}
+        {/*    chatId={ chat._id } */}
+        {/*    messages={currentChatMessages} */}
+        {/*    onSendMessage={handleSendMessage}/>*/}
+        {/*})}*/}
 
         <Link to={{
           pathname: '/create-chat',

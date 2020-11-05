@@ -10,7 +10,7 @@ const ChatModel = ChatSchema(Schema, model, "Chat");
 const MessageModel = MessageSchema(Schema, model, "Message");
 
 module.exports = {
-    UserModel,
-    ChatModel,
-    MessageModel
+  UserModel,
+  ChatModel,
+  MessageModel
 };

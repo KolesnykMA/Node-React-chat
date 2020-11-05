@@ -1,8 +1,10 @@
-const Router = require("express")
-const authService = require("../services/authService")
+const Router = require("express");
+const authService = require("../services/authService");
+const userService = require("../services/userService")
 // import * as authService from '../services/authService.js';
 // import * as userService from '../services/userService';
 // import jwtMiddleware from '../middlewares/jwtMiddleware';
+const jwtValidation = require('../middlewares/jwtValidation.middleware');
 
 const router = Router();
 
@@ -31,9 +33,18 @@ router
 
     )
 
-    // .get(
-    //     '/user',
-    //     (req, res, next) => res.send('Hello'))
+  .get(
+    '/user',
+    jwtValidation,
+    (req, res, next) => {
+      userService.getById(req.user.user_id)
+        .then(data => res.send(data))
+        .catch(error => {
+          res.status(400).json({error: true, message: error.message});
+        })
+    }
+
+  )
 
 
 module.exports = router;

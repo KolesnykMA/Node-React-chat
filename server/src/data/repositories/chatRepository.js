@@ -1,97 +1,97 @@
 const { UserModel, ChatModel } = require('../models/index.js');
 const BaseRepository =  require('./baseRepository.js');
 
-class ChatRepository extends BaseRepository{
-    // Custom methods
+class ChatRepository extends BaseRepository {
+  // Custom methods
 
-    // async getUserCreatedChats(chatCreatorId) {
-    //     try {
-    //         return await this.model.find({ "chatCreatorId": chatCreatorId });
-    //     } catch (error) {
-    //         throw new Error(`${this.model.collection.collectionName}_REPOSITORY_CREATE`)
-    //     }
-    //
-    // }
+  // async getUserCreatedChats(chatCreatorId) {
+  //     try {
+  //         return await this.model.find({ "chatCreatorId": chatCreatorId });
+  //     } catch (error) {
+  //         throw new Error(`${this.model.collection.collectionName}_REPOSITORY_CREATE`)
+  //     }
+  //
+  // }
 
-    async getUserConnectedChatsByUserId(userId) {
-        try {
-            await UserModel.findOne({ "_id":  userId });
-        } catch (error) {
-            throw Error('USER_NOT_EXISTS');
-        }
-
-        return await this.model.find({"connectedUsersId": {"$in": [userId]}});
+  async getUserConnectedChatsByUserId(userId) {
+    try {
+      await UserModel.findOne({ "_id":  userId });
+    } catch (error) {
+      throw Error('USER_NOT_EXISTS');
     }
 
-    async joinChatByUserAndChatId(chatData) {
-        const { userId, chatId, password } = chatData;
-        let chat = {};
+    return await this.model.find({"connectedUsersId": {"$in": [userId]}});
+  }
 
-        try {
-            await UserModel.findOne({ "_id":  userId });
-        } catch (error) {
-            throw Error('USER_NOT_EXISTS');
-        }
+  async joinChatByUserAndChatId(chatData) {
+    const { userId, chatId, password } = chatData;
+    let chat = {};
 
-        try {
-            chat = await this.model.findOne({ "_id":  chatId })
-        } catch (error) {
-            throw Error('CHAT_NOT_EXISTS');
-        }
-
-        if (chat.chatPassword !== password) {
-            throw Error('CHAT_WRONG_PASSWORD');
-        }
-
-        const currentChatUsersId = chat.connectedUsersId
-
-        if (currentChatUsersId.indexOf(userId) !== -1) {
-            throw Error('USER_ALREADY_IN_CHAT');
-        } else {
-            currentChatUsersId.push(userId)
-        }
-
-        let newChatData = {
-            chatCreatorId: chat.chatCreatorId,
-            chatPassword: chat.chatPassword,
-            connectedUsersId: currentChatUsersId,
-            blackListUsersId: chat.blackListUsersId
-        }
-
-        return this.updateById(chatId, newChatData);
+    try {
+      await UserModel.findOne({ "_id":  userId });
+    } catch (error) {
+      throw Error('USER_NOT_EXISTS');
     }
 
-    // Base repo
-
-    getAllChats() {
-        return this.getAll();
+    try {
+      chat = await this.model.findOne({ "_id":  chatId })
+    } catch (error) {
+      throw Error('CHAT_NOT_EXISTS');
     }
 
-    getChatById(chatId) {
-        return this.getById(chatId);
+    if (chat.chatPassword !== password) {
+      throw Error('CHAT_WRONG_PASSWORD');
     }
 
-    async createChat(chat) {
-        const { chatCreatorId } = chat;
+    const currentChatUsersId = chat.connectedUsersId
 
-        if (!await UserModel.findOne({ "_id":  chatCreatorId })) {
-            throw Error('USER_NOT_EXISTS');
-        }
-
-        //check password
-
-        chat.connectedUsersId = [chatCreatorId];
-
-        return this.create(chat);
+    if (currentChatUsersId.indexOf(userId) !== -1) {
+      throw Error('USER_ALREADY_IN_CHAT');
+    } else {
+      currentChatUsersId.push(userId)
     }
 
-    updateChatById(chatId, data) {
-        return this.updateById(chatId, data);
+    let newChatData = {
+      chatCreatorId: chat.chatCreatorId,
+      chatPassword: chat.chatPassword,
+      connectedUsersId: currentChatUsersId,
+      blackListUsersId: chat.blackListUsersId
     }
 
-    deleteChatById(chatId) {
-        return this.deleteById(chatId)
+    return this.updateById(chatId, newChatData);
+  }
+
+  // Base repo
+
+  getAllChats() {
+    return this.getAll();
+  }
+
+  getChatById(chatId) {
+    return this.getById(chatId);
+  }
+
+  async createChat(chat) {
+    const { chatCreatorId } = chat;
+
+    if (!await UserModel.findOne({ "_id":  chatCreatorId })) {
+      throw Error('USER_NOT_EXISTS');
     }
+
+    //check password
+
+    chat.connectedUsersId = [chatCreatorId];
+
+    return this.create(chat);
+  }
+
+  updateChatById(chatId, data) {
+    return this.updateById(chatId, data);
+  }
+
+  deleteChatById(chatId) {
+    return this.deleteById(chatId)
+  }
 }
 
 module.exports = new ChatRepository(ChatModel);

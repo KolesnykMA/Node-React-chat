@@ -1,8 +1,8 @@
 import * as authService from '../../api/authService';
 import { SET_USER } from './actionTypes';
 
-const setUserUniqueId = id => {
-    return localStorage.setItem('user_Id', id)
+const setUserToken = id => {
+    return localStorage.setItem('token', id)
 }
 
 const setUser = user => async dispatch => dispatch({
@@ -10,15 +10,16 @@ const setUser = user => async dispatch => dispatch({
     user
 });
 
-const setAuthData = (user = null, uniqueUserId = '') => (dispatch, getRootState) => {
-    setUserUniqueId(uniqueUserId);
+const setAuthData = (user = null, token = '') => (dispatch, getRootState) => {
+    setUserToken(token);
     setUser(user)(dispatch, getRootState);
 };
 
 export const login = (request) => async (dispatch, getRootState) => {
     const response = await authService.login(request);
-    const loginUser = response.data.currentUser;
-    setAuthData(loginUser, loginUser._id)(dispatch, getRootState);
+    const { currentUser, token } = response.data;
+
+    setAuthData(currentUser, token)(dispatch, getRootState);
 }
 
 export const register = async (request) => {
@@ -26,12 +27,10 @@ export const register = async (request) => {
 }
 
 export const loadCurrentUser = () => async (dispatch, getRootState) => {
-    const LoadedUserUniqueId = localStorage.getItem("user_Id")
+    const user = await authService.getUserByToken()
 
-    if (LoadedUserUniqueId) {
-        const user = await authService.getCurrentUser(LoadedUserUniqueId)
-        const loadedUser = user.data;
-        setUser(loadedUser)(dispatch, getRootState);
+    if (user.data) {
+        await setUser(user.data)(dispatch, getRootState);
     }
 };
 
