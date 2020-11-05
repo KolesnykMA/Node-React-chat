@@ -4,15 +4,6 @@ const BaseRepository =  require('./baseRepository.js');
 class ChatRepository extends BaseRepository {
   // Custom methods
 
-  // async getUserCreatedChats(chatCreatorId) {
-  //     try {
-  //         return await this.model.find({ "chatCreatorId": chatCreatorId });
-  //     } catch (error) {
-  //         throw new Error(`${this.model.collection.collectionName}_REPOSITORY_CREATE`)
-  //     }
-  //
-  // }
-
   async getUserConnectedChatsByUserId(userId) {
     try {
       await UserModel.findOne({ "_id":  userId });
@@ -20,7 +11,9 @@ class ChatRepository extends BaseRepository {
       throw Error('USER_NOT_EXISTS');
     }
 
-    return await this.model.find({"connectedUsersId": {"$in": [userId]}});
+    // console.log(connectedChats, "repo")
+
+    return await this.model.find({"connectedUsersId": {"$in": [userId]}})
   }
 
   async joinChatByUserAndChatId(chatData) {

@@ -20,11 +20,11 @@ const createChat = async (chatData) => {
   })
 };
 
-const getConnectedChats = async (userId) => {
+const getConnectedChats = async () => {
   return new Promise((res, rej) => {
     axios
       .get(
-        `${back_dev_url}/api/chats/connected/?id=${userId}`,
+        `${back_dev_url}/api/chats/connected`,
         getFetchHeaders(),
         )
       .then(response => {

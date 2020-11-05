@@ -16,6 +16,7 @@ module.exports = {
       const user = await userRepository.getUserById(userId);
 
       return {
+        _id: user._id,
         email: user.email,
         username: user.username,
         login: user.login

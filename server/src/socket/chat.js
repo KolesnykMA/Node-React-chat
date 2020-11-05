@@ -1,74 +1,75 @@
 const messageService = require("../api/services/messageService");
-const mainRoomId = "5fa000af5715e297e9f38b23"
+const chatService = require("../api/services/chatService");
 
 const chatsData = new Map();
-const socketData = new Map();
+const socketData = new Set();
 
-const chat = io =>
-{
+const chat = io => {
   io.on('connection', socket => {
-    const userSocketId = socket.id
+    const clientSocketId = socket.id;
+    addNewSocketToSet(clientSocketId);
 
-    addNewSocketToSet(userSocketId);
+    socket.on("connectUserToChats", async (userId) => {
+      try {
+        let userChats = await chatService.getAllConnectedByUserId(userId);
+        let modifiedChats = [];
 
-    socket.on("connectUserToChats", (chats) => {
-      chats.forEach(chat => {
-        connectUserToChat(chat._id, userSocketId)
-      })
+        for (const chat of userChats) {
+          const chatId = (chat._id).toString()
+          connectUserSocketToChat(chatId, clientSocketId);
+
+          const messages = await messageService.getAllByChatId(chat._id);
+          modifiedChats.push({
+            chatCreatorId: chat.chatCreatorId,
+            messages: messages,
+            _id: chat._id
+          })
+        }
+
+        io.to(clientSocketId).emit('sendChatsWithMessagesFromServer', modifiedChats)
+      } catch (error) {
+        console.log(error, "connect")
+      }
     })
 
-    socket.on('message', (messageData) => {
-      const {chatId, messageCreatorId, messageText} = messageData;
+    socket.on('sendMessageFromClient', (messageData) => {
+      const { chatId } = messageData;
 
-      messageService.create({messageCreatorId, chatId, messageText})
+      messageService.create(messageData)
         .then(() => {
-          messageService.getAllByChatId(chatId)
-            .then(messages => {
-              const sendMessages = messages.map(message => {
-                return {
-                  messageCreatorId: message.messageCreatorId,
-                  messageText: message.messageText
-                }
-              })
+          const chatUserSockets = chatsData.get(chatId);
 
-              const chatUsers = chatsData.get(chatId)
-              chatUsers.forEach(user => {
-                io.to(user.socketId).emit('sendChatMessagesFromServer', { chatId, sendMessages })
-              })
-            })
+          chatUserSockets.forEach(socket => {
+            io.to(socket).emit('sendChatMessageFromServer', messageData)
+          })
         })
         .catch(error => {
           socket.emit("sendChatMessagesFromServerError", { error:true });
         })
     })
-
   });
 }
 
 function addNewSocketToSet(socketId) {
-  let user = { socketId, chatIds: [mainRoomId] }
-  socketData.set(socketId, user);
+  socketData.add(socketId);
 }
 
-function connectUserToChat(chatId, socketId) {
-  let user = socketData.get(socketId);
+function connectUserSocketToChat(chatId, socketId) {
+  let chatUserSockets = chatsData.get(chatId);
 
-  if(chatsData.get(chatId)) {
-    let userArray = chatsData.get(chatId);
+  if (chatUserSockets) {
+    let userSockets = chatsData.get(chatId);
 
-    if(userArray.indexOf(user) !== -1) {
+    if(userSockets.indexOf(socketId) !== -1) {
       return
     }
 
-    userArray.push(user);
-    user.chatIds.push(chatId);
-    chatsData.set(chatId, userArray)
+    userSockets.push(socketId);
+    chatsData.set(chatId, userSockets);
   } else {
-
-    let userArray = [];
-    userArray.push(user);
-    user.chatIds.push(chatId);
-    chatsData.set(chatId, userArray)
+    let userSockets = []
+    userSockets.push(socketId)
+    chatsData.set(chatId, userSockets);
   }
 }
 

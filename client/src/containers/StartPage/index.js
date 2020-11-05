@@ -10,61 +10,46 @@ import { getMessagesByChatId } from "../../api/messageService";
 const socket = openSocket('http://localhost:8000');
 
 const StartPage = ({ user }) => {
-  const [connectedChats, setConnectedChats] = useState([]);
-  const [serverResponse, setServerResponse] = useState({});
+  const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [messageFromServer, setMessageFromServer] = useState({});
 
   const [joinChatId, setJoinChatId] = useState("");
   const [joinChatPassword, setJoinChatPassword] = useState("");
 
   useEffect(() => {
-    async function getInitialChats() {
-    //   setLoading(true)
-      const response = await getConnectedChats(user._id);
-      const chats = response.data
+    const userId = user._id;
+    socket.emit("connectUserToChats", (userId));
+  }, []);
 
-      return chats
+  useEffect(() => {
+    setLoading(true);
+    socket.on("sendChatsWithMessagesFromServer", (userChats) => {
+      setChats(userChats);
+      setLoading(false);
+    });
+  }, []);
 
-      // socket.emit("connectUserToChats", user._id)
-    //
-    //   for (const chat of chats) {
-    //     chat.messages = await getMessagesByChatId(chat._id)
-    //   }
-    //
-    //   return chats
-    }
+  useEffect(() => {
+    socket.on("sendChatMessageFromServer", newSavedMessage => {
+      setMessageFromServer(newSavedMessage)
+    })
+  }, []);
 
-    getInitialChats()
-      .then(modifiedChats => {
-        console.log(modifiedChats)
-        // setConnectedChats(modifiedChats)
-        // setLoading(false)
-      })
-      .catch(error => {
-        console.log(error)
-      })
-  }, [])
+  useEffect(() => {
+    const { chatId } = messageFromServer;
 
-  // useEffect(() => {
-  //   socket.on("sendChatMessagesFromServer", response => {
-  //     setServerResponse(response)
-  //   })
-  // }, []);
+    setChats(
+      chats.map(chat =>
+        chat._id === chatId
+          ? {...chat, messages: chat.messages.push(messageFromServer)}
+          : chat
+      )
+    )
+  }, [messageFromServer])
 
-  // useEffect(() => {
-  //   const { chatId, sendMessages } = serverResponse;
-  //
-  //   setConnectedChats(
-  //     connectedChats.map(chat =>
-  //       chat._id === chatId
-  //         ? {...chat, messages: sendMessages}
-  //         : chat
-  //     )
-  //   )
-  // }, [serverResponse])
-
-  const handleSendMessage = (data) => {
-    socket.emit("message", (data))
+  const handleSendMessage = (messageData) => {
+    socket.emit("sendMessageFromClient", (messageData))
   }
 
   const handleJoinChat = () => {
@@ -99,14 +84,13 @@ const StartPage = ({ user }) => {
       </div>
       :
       <div className="start-page" style={{textAlign: "center"}}>
-        {/*{connectedChats.map((chat, id) => {*/}
-        {/*  const currentChatMessages = chat.messages*/}
-        {/*  return <Chat */}
-        {/*    user={ user } */}
-        {/*    chatId={ chat._id } */}
-        {/*    messages={currentChatMessages} */}
-        {/*    onSendMessage={handleSendMessage}/>*/}
-        {/*})}*/}
+        {chats.map((chat, id) => {
+          return <Chat
+            key={"chat_" + chat._id}
+            user={ user }
+            chat = { chat }
+            onSendMessage={ handleSendMessage }/>
+        })}
 
         <Link to={{
           pathname: '/create-chat',

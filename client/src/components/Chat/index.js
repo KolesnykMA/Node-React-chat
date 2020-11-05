@@ -2,13 +2,13 @@ import React, {useEffect, useState} from "react";
 import {Button, Input} from "semantic-ui-react";
 
 
-const Chat = ({ user, chatId, messages, onSendMessage }) => {
+const Chat = ({ user, chat, onSendMessage }) => {
   const [newMessage, setNewMessage] = useState("");
   const [chatMessages, setChatMessages] = useState([]);
 
   useEffect(() => {
-    setChatMessages(messages || [])
-  }, [messages])
+    setChatMessages(chat.messages)
+  }, [])
 
   const messageChanged = data => {
     setNewMessage(data);
@@ -16,7 +16,7 @@ const Chat = ({ user, chatId, messages, onSendMessage }) => {
 
   const handleSendMessage = () => {
     const data = {
-      chatId,
+      chatId: chat._id,
       messageCreatorId: user._id,
       messageText: newMessage,
     }
@@ -27,7 +27,7 @@ const Chat = ({ user, chatId, messages, onSendMessage }) => {
   const renderChatMessages = chatMessages.map((message, id) => {
     let liStyle = user._id === message.messageCreatorId ? { color: "red" } : { color: "blue" }
 
-    return <li key={"message_" + id} style={liStyle}>
+    return <li key={"chat_" + chat._id + "_message_" + id} style={liStyle}>
       From {message.messageCreatorId}: {message.messageText}
     </li>
   })
@@ -39,7 +39,7 @@ const Chat = ({ user, chatId, messages, onSendMessage }) => {
       <div className="chat-greeting">
         Hello { user.username } with id: { user._id }
         <br/>
-        You are in chat with id: { chatId }
+        You are in chat with id: { chat._id }
       </div>
 
       <ul>

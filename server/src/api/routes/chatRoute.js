@@ -21,9 +21,9 @@ router
     // )
 
     .get(
-        '/connected?:id',
+        '/connected',
         (req, res, next) => {
-            chatService.getAllConnectedByUserId(req.query.id)
+            chatService.getAllConnectedByUserId(req.user.user_id)
                 .then(data => res.send(data))
                 .catch(error => {
                     res.status(400).json({ error: true, message: error.message });

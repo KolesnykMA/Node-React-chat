@@ -2,9 +2,20 @@ const MessageRepository = require("../../data/repositories/messageRepository");
 
 module.exports = {
   // custom
-  getAllByChatId: (chatId) => {
+  getAllByChatId: async (chatId) => {
     try {
-      return MessageRepository.getAllMessagesByChatId(chatId);
+      const messages = await MessageRepository.getAllMessagesByChatId(chatId);
+      let returnMessages = [];
+
+      for (const message of messages) {
+        returnMessages.push({
+          messageCreatorId: message.messageCreatorId,
+          messageSentAt: message.messageSentAt,
+          messageText: message.messageText
+        })
+      }
+
+      return returnMessages;
     } catch (error) {
       throw Error(error.message);
       // return {
