@@ -2,19 +2,16 @@ const express = require("express");
 const cors = require("cors");
 const http = require("http");
 const socketIo = require("socket.io");
-const dataBaseConnector = require('./data/db/connection.js');
-const jwtValidation = require('./api/middlewares/jwtValidation.middleware');
-const { socketHandler } = require("./socket/index");
 const env = require('./env');
+const routes = require("./api/routes");
+const dataBaseConnector = require('./data/db/connection.js');
+const { socketHandler } = require("./socket/index");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/api/auth/', require('./api/routes/authRoute'));
-app.use('/api/users/', jwtValidation, require('./api/routes/userRoute'));
-app.use('/api/chats/', jwtValidation, require('./api/routes/chatRoute'));
-app.use('/api/messages/', jwtValidation, require('./api/routes/messageRoute'));
+routes(app);
 
 dataBaseConnector.connect()
   .then(() => {
