@@ -11,7 +11,7 @@ module.exports = {
 
   getById: async (userId) => {
     try {
-      const user = await userRepository.getUserById(userId);
+      const user = await userRepository.getById(userId);
 
       return {
         _id: user._id,
@@ -20,7 +20,7 @@ module.exports = {
         login: user.login
       };
     } catch (error) {
-      throw Error(error.message);
+      throw error;
     }
   },
 

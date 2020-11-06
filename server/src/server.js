@@ -17,8 +17,8 @@ dataBaseConnector.connect()
   .then(() => {
     console.log('Connection to database has been established successfully.');
   })
-  .catch(err => {
-    console.error('Unable to connect to the database:', err);
+  .catch(error => {
+    console.error('Unable to connect to the database:', error);
   });
 
 const socketServer = http.createServer(app);
@@ -26,11 +26,11 @@ const io = socketIo(socketServer);
 socketHandler(io);
 
 app.listen(env.application.serverPort, () => {
-  console.log(`Server is running in ${process.env.NODE_ENV} mode`);
-  console.log(`Server listening on port ${env.application.serverPort}`);
+  console.log(`Server is running in ${process.env.NODE_ENV} mode.`);
+  console.log(`Server listening on port ${env.application.serverPort}.`);
 });
 
 socketServer.listen(env.application.socketPort, () => {
-  console.log(`Socket listening on port ${env.application.socketPort}`);
+  console.log(`Socket listening on port ${env.application.socketPort}.`);
 });
 

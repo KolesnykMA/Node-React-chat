@@ -6,9 +6,9 @@ class UserRepository extends BaseRepository {
     return this.getAll();
   }
 
-  getUserById(id) {
-    return this.getById(id);
-  }
+  // getUserById(id) {
+  //   return this.getById(id);
+  // }
 
   async createUser(user) {
     const { login, email, password, username, avatar } = user;

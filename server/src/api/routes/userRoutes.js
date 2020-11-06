@@ -1,6 +1,7 @@
 const Router = require("express");
 const userService = require("../services/userService");
 const router = Router();
+const { validateGetUser } = require("../middlewares/user.validation.middleware");
 
 router
   .get('/', (req, res, next) => {
@@ -11,7 +12,7 @@ router
         })
     })
 
-  .get('/:id', (req, res, next) => {
+  .get('/:id', validateGetUser, (req, res, next) => {
       userService.getById(req.params.id)
         .then(data => res.send(data))
         .catch(error => {
