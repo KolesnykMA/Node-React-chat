@@ -15,7 +15,19 @@ module.exports = (Schema, model, name) => {
     blackListUsersId: {
       type: Array,
       required: false,
-    }
+    },
+    active: {
+      type: Boolean,
+      required: true
+    },
+    private_stream_key: {
+      type: String,
+      required: true
+    },
+    public_stream_key: {
+      type: String,
+      required: true
+    },
   });
 
   return model(name, ChatSchema);

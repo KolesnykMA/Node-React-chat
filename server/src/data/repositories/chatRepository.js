@@ -1,8 +1,40 @@
 const { UserModel, ChatModel } = require('../models/index.js');
 const BaseRepository =  require('./baseRepository.js');
 
+
 class ChatRepository extends BaseRepository {
-  // Custom methods
+  /*
+    start stream
+   */
+  async startChatByUserId(userId) {
+    try {
+      let newRandomStreamKey = Math.random().toString(36).substring(7);
+
+      await ChatModel.updateOne({ "chatCreatorId": userId },
+        { $set: { "active": true, "private_stream_key": newRandomStreamKey } });
+
+      return newRandomStreamKey;
+    } catch (error) {
+      throw Error('__');
+    }
+  }
+
+  /*
+    finish stream
+   */
+  async finishChatByUserId(userId) {
+    try {
+      const currentChat = await ChatModel.getAllChats({ "chatCreatorId": userId });
+      const { private_stream_key } = currentChat;
+
+      await ChatModel.updateOne({ "chatCreatorId": userId },
+        { $set: { "active": false, "private_stream_key": "" } })
+
+      return private_stream_key;
+    } catch (error) {
+      throw Error('__');
+    }
+  }
 
   async getUserConnectedChatsByUserId(userId) {
     try {
@@ -54,8 +86,8 @@ class ChatRepository extends BaseRepository {
 
   // Base repo
 
-  getAllChats() {
-    return this.getAll();
+  getAllChats(params) {
+    return this.getAll(params);
   }
 
   getChatById(chatId) {

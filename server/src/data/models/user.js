@@ -22,7 +22,7 @@ module.exports = (Schema, model, name) => {
     avatar: {
       type: String,
       required: false,
-    }
+    },
   });
 
   return model(name, UserSchema);

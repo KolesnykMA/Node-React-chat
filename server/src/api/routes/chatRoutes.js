@@ -4,6 +4,22 @@ const chatService = require("../services/chatService");
 const router = Router();
 
 router
+  .post('/start', (req, res, next) => {
+    chatService.startChat(req.user.user_id)
+      .then(data => res.send(data))
+      .catch(error => {
+        res.status(400).json({ error: true, message: error.message });
+      })
+  })
+
+  .post('/finish', (req, res, next) => {
+    chatService.finishChat(req.user.user_id)
+      .then(data => res.send(data))
+      .catch(error => {
+        res.status(400).json({ error: true, message: error.message });
+      })
+  })
+
   .get('/connected', (req, res, next) => {
     chatService.getAllConnectedByUserId(req.user.user_id)
       .then(data => res.send(data))
@@ -22,7 +38,7 @@ router
 
   // base
   .get('/', (req, res, next) => {
-    chatService.getAll()
+    chatService.getAll(req.query)
       .then(data => res.send(data))
       .catch(error => {
         res.status(400).json({error: true, message: error.message});

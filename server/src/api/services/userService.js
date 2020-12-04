@@ -1,9 +1,11 @@
 const userRepository = require("../../data/repositories/userRepository.js");
 
 module.exports = {
-  getAll: async () => {
+  getAll: async (params) => {
     try {
-      return await userRepository.getAllUsers();
+      // TODO validate input params
+
+      return await userRepository.getAllUsers(params);
     } catch (error) {
       throw Error(error.message);
     }
@@ -11,38 +13,51 @@ module.exports = {
 
   getById: async (userId) => {
     try {
+      // TODO validate input params
+
       const user = await userRepository.getById(userId);
 
       return {
         _id: user._id,
         email: user.email,
         username: user.username,
-        login: user.login
+        login: user.login,
+        stream_key: user.stream_key,
       };
     } catch (error) {
       throw error;
     }
   },
 
-  create: async () => {
+  create: async (body) => {
     try {
-      return await userRepository.getAllUsers();
+      // TODO validate input params
+
+      return await userRepository.createUser(body);
     } catch (error) {
       throw Error(error.message);
     }
   },
 
-  update: async () => {
+  update: async (chatData) => {
     try {
-      // return await userRepository.getAllUsers();
+      //TODO validate params
+
+      const { userId, body } = chatData;
+
+      //TODO if user exists
+
+      return await userRepository.updateUserById(userId, body);
     } catch (error) {
       throw Error(error.message);
     }
   },
 
-  delete: async () => {
+  delete: async (userId) => {
     try {
-      return await userRepository.getAllUsers();
+      //TODO validate params
+
+      return await userRepository.deleteUserById(userId);
     } catch (error) {
       throw Error(error.message);
     }

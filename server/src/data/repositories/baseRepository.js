@@ -4,9 +4,9 @@ class BaseRepository {
     this.modelName = model.collection.collectionName;
   }
 
-  async getAll() {
+  async getAll(params) {
     try {
-      return await this.model.find({});
+      return await this.model.find(params);
     } catch (error) {
       throw Error(`${this.modelName}_BASE_REPOSITORY_GET_ALL`)
     }
@@ -45,7 +45,7 @@ class BaseRepository {
 
   async deleteById(id) {
     try {
-      return await this.model.deleteOne({ "_id": id})
+      return await this.model.deleteOne({ "_id": id })
     } catch (error) {
       throw Error(`${this.model.collection.collectionName}_REPOSITORY_DELETE`);
     }

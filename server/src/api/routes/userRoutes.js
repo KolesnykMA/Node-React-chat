@@ -5,7 +5,7 @@ const { validateGetUser } = require("../middlewares/user.validation.middleware")
 
 router
   .get('/', (req, res, next) => {
-      userService.getAll()
+      userService.getAll(req.query)
         .then(data => res.send(data))
         .catch(error => {
           res.status(400).json({error: true, message: error.message});
@@ -27,7 +27,7 @@ router
   })
 
   .put('/:id', (req, res, next) => {
-    userService.update(req.query.id, req.body)
+    userService.update({ userId: req.params.id, body: req.body })
       .then(data => res.send(data))
       .catch(error => {
         res.status(400).json({error: true, message: error.message});
@@ -35,7 +35,7 @@ router
   })
 
   .delete('/:id', (req, res, next) => {
-    userService.delete(req.query.id)
+    userService.delete(req.params.id)
       .then(data => res.send(data))
       .catch(error => {
         res.status(400).json({error: true, message: error.message});

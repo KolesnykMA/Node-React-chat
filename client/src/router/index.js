@@ -3,11 +3,12 @@ import { Route, Switch } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 
-import StartPage from "../containers/StartPage";
+// import StartPage from "../containers/StartPage";
 import LoginPage from "../containers/LoginPage";
 import RegistrationPage from "../containers/RegistrationPage";
 import NotFound from "../containers/NotFound";
 import ChatCreatePage from "../containers/Chat/ChatCreatePage"
+import StreamHomePage from "../containers/StreamHomePage";
 
 import Header from "../components/Header";
 
@@ -18,10 +19,10 @@ import { loadCurrentUser, logoutCurrentUser } from "../containers/Profile/action
 
 
 const Routing = (
-    { 
-        user, 
-        isAuthorized, 
-        loadCurrentUser: loadUser, 
+    {
+        user,
+        isAuthorized,
+        loadCurrentUser: loadUser,
         isLoading,
         logoutCurrentUser: logOutUser
     }) => {
@@ -34,9 +35,9 @@ const Routing = (
 
     return (
         isLoading
-            ? 
+            ?
                 <div className="loading">
-                    loading 
+                    loading
                 </div>
             : (
                 <div className="fill">
@@ -50,7 +51,7 @@ const Routing = (
                       <PublicRoute exact path="/login" component={LoginPage} />
                       <PublicRoute exact path="/registration" component={RegistrationPage} />
 
-                      <PrivateRoute exact path="/" component={StartPage} />
+                      <PrivateRoute exact path="/" component={StreamHomePage} />
                       <PrivateRoute exact path="/create-chat" component={ChatCreatePage} />
 
                       <Route path="*" exact component={NotFound} />

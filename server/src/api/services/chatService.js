@@ -1,11 +1,63 @@
-const ChatRepository = require("../../data/repositories/chatRepository.js");
+const chatRepository = require("../../data/repositories/chatRepository.js");
+const axios = require("axios");
+const mediaServerUrl = 'http://localhost:4000/';
+
+const startStream = (streamKey) => {
+  try {
+    return new Promise((res, rej) => {
+      axios.post(mediaServerUrl + "start-stream", { streamKey })
+        .then(result => {
+          res(result);
+        }).catch(error => {
+        rej(error);
+      })
+    })
+  } catch (error) {
+    //TODO
+  }
+}
+
+const finishStream = (streamKey) => {
+  try {
+    return new Promise((res, rej) => {
+      axios.post(mediaServerUrl + "finish-stream", { streamKey })
+        .then(result => {
+          res(result);
+        }).catch(error => {
+        rej(error);
+      })
+    })
+  } catch (error) {
+    //TODO
+  }
+}
 
 module.exports = {
-  // custom
+  startChat: async (id) => {
+    try {
+      //TODO validate params
+      const startStreamKey = await chatRepository.startChatByUserId(id);
+      return await startStream(startStreamKey);
+    } catch (error) {
+      throw Error(error.message);
+    }
+  },
+
+  finishChat: async (id) => {
+    try {
+      //TODO validate params
+      const finishStreamKey = await chatRepository.finishChatByUserId(id);
+      return await finishStream(finishStreamKey);
+    } catch (error) {
+      throw Error(error.message);
+    }
+  },
 
   getAllConnectedByUserId: async (id) => {
     try {
-      return await ChatRepository.getUserConnectedChatsByUserId(id);
+      //TODO validate params
+
+      return await chatRepository.getUserConnectedChatsByUserId(id);
     } catch (error) {
       throw Error(error.message);
     }
@@ -13,17 +65,20 @@ module.exports = {
 
   joinChat: async (chatData) => {
     try {
-      return await ChatRepository.joinChatByUserAndChatId(chatData);
+      //TODO validate params
+
+      return await chatRepository.joinChatByUserAndChatId(chatData);
     } catch (error) {
       throw Error(error.message);
     }
   },
 
   //base
-
-  getAll: async () => {
+  getAll: async (params) => {
     try {
-      return await ChatRepository.getAllChats();
+      //TODO validate params
+
+      return await chatRepository.getAllChats(params);
     } catch (error) {
       throw Error(error.message);
     }
@@ -31,7 +86,9 @@ module.exports = {
 
   getById: async (id) => {
     try {
-      return await ChatRepository.getChatById(id);
+      //TODO validate params
+
+      return await chatRepository.getChatById(id);
     } catch (error) {
       throw Error(error.message);
     }
@@ -39,7 +96,9 @@ module.exports = {
 
   create: async (chatData) => {
     try {
-      const newChat = await ChatRepository.createChat(chatData);
+      //TODO validate params
+
+      const newChat = await chatRepository.createChat(chatData);
 
       return (newChat);
     } catch (error) {
@@ -49,11 +108,13 @@ module.exports = {
 
   update: async (chatData) => {
     try {
+      //TODO validate params
+
       const { chatId, body } = chatData;
 
-      // if chat exists
+      //TODO if chat exists
 
-      return await ChatRepository.updateChatById(chatId, body);
+      return await chatRepository.updateChatById(chatId, body);
     } catch (error) {
       throw Error(error.message);
     }
@@ -61,7 +122,9 @@ module.exports = {
 
   delete: async (chatId) => {
     try {
-      return await ChatRepository.deleteChatById(chatId);
+      //TODO validate params
+
+      return await chatRepository.deleteChatById(chatId);
     } catch (error) {
       throw Error(error.message);
     }
