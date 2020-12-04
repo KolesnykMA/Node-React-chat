@@ -6,6 +6,7 @@ import openSocket from 'socket.io-client';
 import { getConnectedChats, joinUserToChat } from "../../api/chatService"
 import Chat from "../../components/Chat";
 import { getMessagesByChatId } from "../../api/messageService";
+import VideoPlayer from "../../components/VideoPlayer";
 
 const socket = openSocket('http://localhost:8000');
 
@@ -84,6 +85,8 @@ const StartPage = ({ user }) => {
       </div>
       :
       <div className="start-page" style={{textAlign: "center"}}>
+        <VideoPlayer/>
+
         {chats.map((chat, id) => {
           return <Chat
             key={"chat_" + chat._id}
