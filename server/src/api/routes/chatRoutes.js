@@ -4,6 +4,14 @@ const chatService = require("../services/chatService");
 const router = Router();
 
 router
+  .get('/verify-started', (req, res, next) => {
+    chatService.verifyStartedChat(req.user.user_id)
+      .then(data => res.send(data))
+      .catch(error => {
+        res.status(400).json({ error: true, message: error.message });
+      })
+  })
+
   .post('/start', (req, res, next) => {
     chatService.startChat(req.user.user_id)
       .then(data => res.send(data))

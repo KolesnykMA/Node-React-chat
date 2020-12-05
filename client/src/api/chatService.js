@@ -55,8 +55,74 @@ const joinUserToChat = async (chatData) => {
   })
 };
 
+const getActiveChats = () => {
+  return new Promise((res, rej) => {
+    axios
+      .get(
+      `${back_dev_url}/api/chats?active=true`,
+        getFetchHeaders()
+      )
+      .then(response => {
+        res(response)
+      }).catch(error => {
+        rej(error)
+    })
+  })
+}
+
+const getUserChat = () => {
+  return new Promise((res, rej) => {
+    axios
+      .get(
+      `${back_dev_url}/api/chats/verify-started`,
+        getFetchHeaders()
+      )
+      .then(response => {
+        res(response)
+      }).catch(error => {
+        rej(error)
+      })
+  })
+}
+
+const startStream = () => {
+  return new Promise((res, rej) => {
+    axios
+      .post(
+        `${back_dev_url}/api/chats/start`,
+        {},
+        getFetchHeaders(),
+      )
+      .then(response => {
+        res(response)
+      }).catch(error => {
+      rej(error)
+    })
+  })
+}
+
+const finishStream = () => {
+  return new Promise((res, rej) => {
+    axios
+      .post(
+        `${back_dev_url}/api/chats/finish`,
+        {},
+        getFetchHeaders(),
+      )
+      .then(response => {
+        res(response)
+      }).catch(error => {
+      rej(error)
+    })
+  })
+}
+
 module.exports = {
   createChat,
   getConnectedChats,
-  joinUserToChat
+  joinUserToChat,
+  getActiveChats,
+  getUserChat,
+  startStream,
+  finishStream
 }

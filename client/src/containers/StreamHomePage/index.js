@@ -1,25 +1,73 @@
 import React, {useEffect, useState} from 'react';
-import axios from 'axios';
 import {Link} from 'react-router-dom';
 import {connect} from "react-redux";
-// import Chat from "../../components/Chat";
+import { getActiveChats, getUserChat, startStream, finishStream } from "../../api/chatService"
+import {Button} from "semantic-ui-react";
 
 const StreamHomePage = ({ user }) => {
   const [chats, setChats] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [userChat, setUserChat] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const activeChats = getActiveChats();
-    console.log(activeChats);
+    updateLiveStreamInfo();
   }, []);
 
-  function getActiveChats() {
-    axios.get('http://127.0.0.1:' + '3001' + '/api/chats?active=true')
+  const updateLiveStreamInfo = () => {
+    getLiveStreams();
+    getLiveUserStream();
+  }
+
+  const getLiveStreams = () => {
+    setLoading(true);
+    getActiveChats()
       .then(res => {
         let chats = res.data;
         setChats(chats);
       })
-      .finally(() => setLoading(false))
+      .catch(error => {
+
+      })
+      .finally(() => {
+        setLoading(false);
+      })
+  }
+
+  const getLiveUserStream = () => {
+    getUserChat()
+      .then(res => {
+        let userChat = res.data;
+        setUserChat(userChat);
+      })
+      .catch(error => {
+
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }
+
+  const startLiveStream = () => {
+    startStream()
+      .then(res => {
+        updateLiveStreamInfo();
+        alert(res);
+      })
+      .catch(error => {
+        alert(error)
+      })
+  }
+
+  const finishLiveStream = () => {
+    finishStream()
+      .then(res => {
+        updateLiveStreamInfo();
+        alert(res);
+      })
+      .catch(error => {
+        alert(error)
+      })
+
   }
 
   return (
@@ -29,13 +77,33 @@ const StreamHomePage = ({ user }) => {
         loading
       </div>
       :
-      <div className="container mt-5">
-        <h4>Live Chats</h4>
-        <hr className="my-4"/>
-        <div className="streams row">
+      <div className="container">
+        <div className="user-stream" style={{border: "3px solid blue"}}>
+          { userChat
+            ?
+              <div>
+                You are live right now!
+                Your stream key is { userChat.private_stream_key }
+                <Button onClick={finishLiveStream}>
+                  You can finish your stream right now!
+                </Button>
+              </div>
+            :
+              <div>
+                You are offline right now!
+                <Button onClick={startLiveStream}>
+                  Start your stream right now
+                </Button>
+              </div>
+          }
+        </div>
+
+
+        <div className="live-streams">
+          <h4>Live Chats</h4>
           {chats.map((chat, id) => {
             return (
-              <div className="stream col-xs-12 col-sm-12 col-md-3 col-lg-4" key={id}>
+              <div className="stream__details" key={id} style={{border: "3px solid violet"}}>
                 <span className="live-label">LIVE</span>
                 <Link to={'/stream/'}>
                   <div className="stream-thumbnail">
@@ -43,9 +111,9 @@ const StreamHomePage = ({ user }) => {
                   </div>
                 </Link>
 
-                <span className="username">
-                  <Link to={'/stream/'}>
-                    chat name
+                <span className="link-to-stream">
+                  <Link to={{pathname: "/stream-page/123213213", sampleParam: "Hello", sampleParam2: "World!" }}>
+                    Go to stream
                   </Link>
                 </span>
               </div>
@@ -59,8 +127,6 @@ const StreamHomePage = ({ user }) => {
 const mapStateToProps = ({ profile }) => ({
   user: profile.user,
 });
-
-// const mapDispatchToProps = dispatch => bindActionCreators(actions, dispatch);
 
 export default connect(
   mapStateToProps,

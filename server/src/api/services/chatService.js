@@ -1,15 +1,17 @@
 const chatRepository = require("../../data/repositories/chatRepository.js");
 const axios = require("axios");
-const mediaServerUrl = 'http://localhost:4000/';
+const mediaServerUrl = 'http://localhost:4000';
 
 const startStream = (streamKey) => {
+  console.log("Starting stream from api server")
   try {
     return new Promise((res, rej) => {
-      axios.post(mediaServerUrl + "start-stream", { streamKey })
+      axios.post(mediaServerUrl + "/start-stream", { streamKey })
         .then(result => {
-          res(result);
+          console.log(result.data, "FROM media")
+          res(result.data);
         }).catch(error => {
-        rej(error);
+          rej(error);
       })
     })
   } catch (error) {
@@ -20,9 +22,9 @@ const startStream = (streamKey) => {
 const finishStream = (streamKey) => {
   try {
     return new Promise((res, rej) => {
-      axios.post(mediaServerUrl + "finish-stream", { streamKey })
+      axios.post(mediaServerUrl + "/stop-stream", { streamKey })
         .then(result => {
-          res(result);
+          res(result.data);
         }).catch(error => {
         rej(error);
       })
@@ -33,9 +35,19 @@ const finishStream = (streamKey) => {
 }
 
 module.exports = {
+  verifyStartedChat: async (id) => {
+    try {
+      //TODO validate params
+      return await chatRepository.verifyStartedChatByUserId(id);
+    } catch (error) {
+      throw Error(error.message);
+    }
+  },
+
   startChat: async (id) => {
     try {
       //TODO validate params
+      console.log(id, "service")
       const startStreamKey = await chatRepository.startChatByUserId(id);
       return await startStream(startStreamKey);
     } catch (error) {
@@ -46,6 +58,7 @@ module.exports = {
   finishChat: async (id) => {
     try {
       //TODO validate params
+      console.log(id, "service")
       const finishStreamKey = await chatRepository.finishChatByUserId(id);
       return await finishStream(finishStreamKey);
     } catch (error) {

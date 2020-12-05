@@ -4,15 +4,25 @@ const BaseRepository =  require('./baseRepository.js');
 
 class ChatRepository extends BaseRepository {
   /*
+    verify started stream
+   */
+  async verifyStartedChatByUserId(userId) {
+    try {
+      return await ChatModel.findOne({ "chatCreatorId":  userId, "active": true });
+    } catch (error) {
+      throw Error('__');
+    }
+  }
+  /*
     start stream
    */
   async startChatByUserId(userId) {
     try {
       let newRandomStreamKey = Math.random().toString(36).substring(7);
-
+      console.log(newRandomStreamKey, "chatrep")
       await ChatModel.updateOne({ "chatCreatorId": userId },
         { $set: { "active": true, "private_stream_key": newRandomStreamKey } });
-
+      console.log("Updated")
       return newRandomStreamKey;
     } catch (error) {
       throw Error('__');
@@ -24,8 +34,10 @@ class ChatRepository extends BaseRepository {
    */
   async finishChatByUserId(userId) {
     try {
-      const currentChat = await ChatModel.getAllChats({ "chatCreatorId": userId });
-      const { private_stream_key } = currentChat;
+      const currentChat = await ChatModel.findOne({ "chatCreatorId": userId });
+      console.log(currentChat, "cur chat")
+      const private_stream_key = currentChat.private_stream_key;
+      console.log(private_stream_key, "private key to delete")
 
       await ChatModel.updateOne({ "chatCreatorId": userId },
         { $set: { "active": false, "private_stream_key": "" } })
