@@ -19,13 +19,18 @@ class ChatRepository extends BaseRepository {
   async startChatByUserId(userId) {
     try {
       let newRandomStreamKey = Math.random().toString(36).substring(7);
-      console.log(newRandomStreamKey, "chatrep")
+      const userChat = await ChatModel.findOne({ "chatCreatorId": userId });
+
+      if (!userChat) {
+        const newUser = await this.createChat({ chatCreatorId: userId });
+      }
+
       await ChatModel.updateOne({ "chatCreatorId": userId },
-        { $set: { "active": true, "private_stream_key": newRandomStreamKey } });
-      console.log("Updated")
+          { $set: { "active": true, "private_stream_key": newRandomStreamKey } });
+
       return newRandomStreamKey;
     } catch (error) {
-      throw Error('__');
+      throw Error(error);
     }
   }
 
@@ -35,9 +40,7 @@ class ChatRepository extends BaseRepository {
   async finishChatByUserId(userId) {
     try {
       const currentChat = await ChatModel.findOne({ "chatCreatorId": userId });
-      console.log(currentChat, "cur chat")
       const private_stream_key = currentChat.private_stream_key;
-      console.log(private_stream_key, "private key to delete")
 
       await ChatModel.updateOne({ "chatCreatorId": userId },
         { $set: { "active": false, "private_stream_key": "" } })
@@ -59,7 +62,7 @@ class ChatRepository extends BaseRepository {
   }
 
   async joinChatByUserAndChatId(chatData) {
-    const { userId, chatId, password } = chatData;
+    const { userId, chatId } = chatData;
     let chat = {};
 
     try {
@@ -74,9 +77,9 @@ class ChatRepository extends BaseRepository {
       throw Error('CHAT_NOT_EXISTS');
     }
 
-    if (chat.chatPassword !== password) {
-      throw Error('CHAT_WRONG_PASSWORD');
-    }
+    // if (chat.chatPassword !== password) {
+    //   throw Error('CHAT_WRONG_PASSWORD');
+    // }
 
     const currentChatUsersId = chat.connectedUsersId
 
@@ -88,7 +91,6 @@ class ChatRepository extends BaseRepository {
 
     let newChatData = {
       chatCreatorId: chat.chatCreatorId,
-      chatPassword: chat.chatPassword,
       connectedUsersId: currentChatUsersId,
       blackListUsersId: chat.blackListUsersId
     }
@@ -116,6 +118,9 @@ class ChatRepository extends BaseRepository {
     //check password
 
     chat.connectedUsersId = [chatCreatorId];
+    chat.blackListUsersId = [];
+    chat.active = false;
+    chat.private_stream_key = "default";
 
     return this.create(chat);
   }

@@ -4,10 +4,10 @@ module.exports = (Schema, model, name) => {
       type: String,
       required: true,
     },
-    chatPassword: {
-      type: String,
-      required: true
-    },
+    // chatPassword: {
+    //   type: String,
+    //   required: true
+    // },
     connectedUsersId: {
       type: Array,
       required: false,
@@ -23,11 +23,7 @@ module.exports = (Schema, model, name) => {
     private_stream_key: {
       type: String,
       required: true
-    },
-    public_stream_key: {
-      type: String,
-      required: true
-    },
+    }
   });
 
   return model(name, ChatSchema);

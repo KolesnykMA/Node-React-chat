@@ -2,70 +2,51 @@ const messageService = require("../api/services/messageService");
 const chatService = require("../api/services/chatService");
 
 const chatsData = new Map();
-const socketData = new Set();
 
 const chat = io => {
   io.on('connection', socket => {
     const clientSocketId = socket.id;
-    addNewSocketToSet(clientSocketId);
 
-    socket.on("connectUserToChats", async (userId) => {
+    socket.on("connectUserToChat", async (chatId) => {
       try {
-        let userChats = await chatService.getAllConnectedByUserId(userId);
-        let modifiedChats = [];
-
-        for (const chat of userChats) {
-          const chatId = (chat._id).toString()
-          connectUserSocketToChat(chatId, clientSocketId);
-
-          const messages = await messageService.getAllByChatId(chat._id);
-          modifiedChats.push({
-            chatCreatorId: chat.chatCreatorId,
-            messages: messages,
-            _id: chat._id
-          })
-        }
-
-        io.to(clientSocketId).emit('sendChatsWithMessagesFromServer', modifiedChats)
+        const chatIdString = (chatId).toString()
+        connectUserSocketToChat(chatIdString, clientSocketId);
+        // const messages = await messageService.getAllByChatId(chatIdString);
+        // io.to(clientSocketId).emit('sendChatMessageFromServer', messages
       } catch (error) {
-        socket.emit("sendChatMessagesFromServerError", { error: true, message: "on.connectUserToChats" });
+        //socket.emit("getChatMessagesError", { error: error, message: "on.connectUserToChat" });
       }
     })
 
-    socket.on('sendMessageFromClient', (messageData) => {
+    socket.on('sendChatMessageFromClient', (messageData) => {
       const { chatId } = messageData;
 
       messageService.create(messageData)
         .then(() => {
           const chatUserSockets = chatsData.get(chatId);
 
+          console.log(chatUserSockets)
+
           chatUserSockets.forEach(socket => {
             io.to(socket).emit('sendChatMessageFromServer', messageData)
           })
         })
         .catch(error => {
-          socket.emit("sendChatMessagesFromServerError", { error: true, message: "on.sendMessageFromClient" });
+          //socket.emit("sendChatMessagesFromServerError", { error: error, message: "on.sendMessageFromClient" });
         })
     })
   });
-}
-
-function addNewSocketToSet(socketId) {
-  socketData.add(socketId);
 }
 
 function connectUserSocketToChat(chatId, socketId) {
   let chatUserSockets = chatsData.get(chatId);
 
   if (chatUserSockets) {
-    let userSockets = chatsData.get(chatId);
-
-    if(userSockets.indexOf(socketId) !== -1) {
+    if(chatUserSockets.indexOf(socketId) !== -1) {
       return
     }
-
-    userSockets.push(socketId);
-    chatsData.set(chatId, userSockets);
+    chatUserSockets.push(socketId);
+    chatsData.set(chatId, chatUserSockets);
   } else {
     let userSockets = []
     userSockets.push(socketId)

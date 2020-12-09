@@ -3,7 +3,6 @@ const axios = require("axios");
 const mediaServerUrl = 'http://localhost:4000';
 
 const startStream = (streamKey) => {
-  console.log("Starting stream from api server")
   try {
     return new Promise((res, rej) => {
       axios.post(mediaServerUrl + "/start-stream", { streamKey })
@@ -47,7 +46,6 @@ module.exports = {
   startChat: async (id) => {
     try {
       //TODO validate params
-      console.log(id, "service")
       const startStreamKey = await chatRepository.startChatByUserId(id);
       return await startStream(startStreamKey);
     } catch (error) {
@@ -58,7 +56,6 @@ module.exports = {
   finishChat: async (id) => {
     try {
       //TODO validate params
-      console.log(id, "service")
       const finishStreamKey = await chatRepository.finishChatByUserId(id);
       return await finishStream(finishStreamKey);
     } catch (error) {

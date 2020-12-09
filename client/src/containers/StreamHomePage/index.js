@@ -112,7 +112,7 @@ const StreamHomePage = ({ user }) => {
                 </Link>
 
                 <span className="link-to-stream">
-                  <Link to={{pathname: "/stream-page/123213213", sampleParam: "Hello", sampleParam2: "World!" }}>
+                  <Link to={{ pathname: "/stream-page/123213213", chatData: chat }}>
                     Go to stream
                   </Link>
                 </span>

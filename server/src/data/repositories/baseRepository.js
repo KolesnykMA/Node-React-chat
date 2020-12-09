@@ -23,14 +23,14 @@ class BaseRepository {
   async create(data) {
     try {
       const newModelObject = new this.model(data);
-      await newModelObject.save(newModelObject);
+      await newModelObject.save();
 
       return {
         message: `New ${this.modelName} created.`,
         data
       };
     } catch (error) {
-      throw Error(`${this.modelName}_REPOSITORY_CREATE`);
+      throw Error(`${this.modelName}_REPOSITORY_CREATE \n ${error}`);
     }
 
   }
